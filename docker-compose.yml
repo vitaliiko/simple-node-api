@@ -1,0 +1,31 @@
+version: '3'
+services:
+  app:
+    container_name: app
+    build: .
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - DD_AGENT_HOST=datadog
+      - DD_TRACE_AGENT_PORT=8126
+    networks:
+      - node-api
+
+  datadog:
+    container_name: datadog
+    image: datadog/agent:latest
+    restart: always
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+    networks:
+      - node-api
+    volumes:
+     - /var/run/docker.sock:/var/run/docker.sock
+     - /proc/mounts:/host/proc/mounts:ro
+     - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+
+networks:
+  node-api:
